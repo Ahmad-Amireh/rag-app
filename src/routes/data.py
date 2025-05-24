@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, APIRouter, UploadFile 
+from fastapi import FastAPI, Depends, APIRouter, UploadFile, status
+from fastapi.responses import JSONResponse
 from helpers.config import get_settings, Settings 
 from controllers import DataController
 
@@ -12,4 +13,11 @@ async def upload_data(project_id: str, file: UploadFile, app_settings: Settings 
     
     #validate the file properties
     is_valid, result_signal = DataController().validate_upload_file(file= file)
-    return {"signal":result_signal}
+    if not is_valid:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "signal": result_signal
+            })
+    else: 
+        return {"signal": result_signal}
