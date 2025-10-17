@@ -9,13 +9,5 @@ class DataChunk(BaseModel):
     chunk_order: int = Field(..., gt=0)
     chunk_project_id: ObjectId
 
-
-    @field_validator("project_id")
-    @classmethod
-    def validate_project_id(cls, value: str) -> str:
-        if not value.isalnum():
-            raise ValueError('project_id must be alphanumeric')
-        return value
-    
     class Config:
         arbitrary_types_allowed = True
