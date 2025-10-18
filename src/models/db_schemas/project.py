@@ -15,3 +15,17 @@ class Project(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True # to allow not pydantic 
+
+    
+    @classmethod
+    def get_indexes(cls):
+        return [
+            {
+                "key": [
+                    ("project_id",1)  #1 Asc and -1 Desc
+                ],
+                "name": "project_id_index_1",
+                "unique": True
+
+            }
+        ]
