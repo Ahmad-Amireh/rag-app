@@ -43,13 +43,22 @@ class ChunkModel(BaseDataModel):
         
         return DataChunk(**result)
     
-    async def insert_many_chunks(self, chunks: list, batch_size: int = 100):
-        for i in range(0, len(chunks), batch_size):
-            batch = chunks[i:i + batch_size]
-            docs = [chunk.model_dump() for chunk in batch]
-            await self.collection.insert_many(docs)
+ 
+    async def insert_many_chunks(self, chunks: list, batch_size: int=100):
 
-        return {"inserted_count": len(chunks)}
+        for i in range(0, len(chunks), batch_size):
+            batch = chunks[i:i+batch_size]
+
+            operations = [
+                InsertOne(chunk.dict(by_alias=True, exclude_unset=True))
+                for chunk in batch
+            ]
+
+            await self.collection.bulk_write(operations)
+        
+        return len(chunks)
+
+
     
     async def delete_chunk_by_project_id(self, project_id:ObjectId):
         result = await self.collection.delete_many({
