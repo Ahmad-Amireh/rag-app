@@ -113,7 +113,8 @@ async def search_index(request: Request, project_id:str, search_request:SearchRe
     nlp_controller = NLPController(
         vectordb_client= request.app.vectordb_client,
         generation_client= request.app.generation_client,
-        embedding_client= request.app.embedding_client
+        embedding_client= request.app.embedding_client,
+        template_parser= request.app.template_parser
     )
 
     results = nlp_controller.search_vector_db_collection(
@@ -132,5 +133,5 @@ async def search_index(request: Request, project_id:str, search_request:SearchRe
         status_code=status.HTTP_200_OK,
         content={
             "signal": ResponseSignal.VECTOR_SEARCH_SUCCESS.value,
-            "results": results}
+            "results": [result.dict() for result in results]}
     )

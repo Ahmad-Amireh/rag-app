@@ -8,12 +8,13 @@ import logging
 
 class NLPController(BaseController):
     
-    def __init__(self, vectordb_client, generation_client, embedding_client):
+    def __init__(self, vectordb_client, generation_client, embedding_client, template_parser):
         super().__init__()
 
         self.vectordb_client = vectordb_client
         self.gemeration_client = generation_client
         self.embedding_client = embedding_client
+        self.template_parser = template_parser
         self.logger = logging.getLogger(__name__)
 
     def create_collection_name(self, project_id: str):
@@ -105,7 +106,30 @@ class NLPController(BaseController):
         if not results:
             return False
 
-        return json.loads(
-                json.dumps(results, default = lambda x : x.__dict__)
-            )
+        return results
+    
+
+    def answer_rag_question(self, project: Project, query: str, limit: int = 10):
+
+        # step1: retrieved related documents
+        retrieved_documents = self.search_vector_db_collection(project= project, text= query, limit=limit)
+
+        if not retrieved_documents or len(retrieved_documents)==0 :
+            return None
         
+        # step 2: Construct LLM prompt 
+        system_prompt = self.template_parser.get("rag", "system_prompt")
+        # documents_prompts = []
+
+        # for idx, doc in enumerate(retrieved_documents):
+        #     documents_prompts.append(
+        #         self.template_parser.get("rag", "document_prompt", {
+        #             "doc_num" : idx + 1,
+        #             "chunk_text": doc.text
+        #         } )
+        #     )
+
+        documents_prompts = [ self.template_parser.get("rag", "document_prompt", { "doc_num" : idx + 1, "chunk_text": doc.text }) 
+                             for idx, doc in enumerate(retrieved_documents)]
+        
+        footer_prompt = self.template_parser.get("rag", "footer_prompt")
