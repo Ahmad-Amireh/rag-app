@@ -5,6 +5,7 @@ from helpers.config import get_settings
 from stores.llm.LLMFactory import LLMProviderFactory
 app = FastAPI()
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
+from stores.llm.templates import TemplateParser
 
 @app.on_event("startup")
 async def startup_span():
@@ -29,6 +30,11 @@ async def startup_span():
         provider = settings.VECTOR_DB_BACKEND
     )
     app.vectordb_client.connect()
+
+    app.template_parser= TemplateParser(
+        language = settings.PRIMARY_LANG,
+        default_language = settings.DEFAULT_LANG
+    )
 
 
 @app.on_event("shutdown")  # Changed from "startup" to "shutdown"
