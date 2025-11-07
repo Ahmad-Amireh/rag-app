@@ -43,9 +43,7 @@ class ProjectModel(BaseDataModel):
 
         if record is None:
             # create new project
-            print("hi")
             project = Project(project_id=project_id)
-            print(project)
             project = await self.create_project(project=project)
 
             return project
