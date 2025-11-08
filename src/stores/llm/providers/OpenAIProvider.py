@@ -22,7 +22,8 @@ class OpenAIProvider(LLMInterface):
         self.embedding_size =  None
 
         self.client = OpenAI(api_key= self.api_key,
-                        base_url= self.api_url)
+                        base_url= self.api_url if self.api_url and len(self.api_url) else None)
+        self.enums = OPENAIEnums
         
         self.logger = logging.getLogger(__name__)
 
@@ -58,10 +59,10 @@ class OpenAIProvider(LLMInterface):
             temperature=temperature
         )
 
-        if  not response or not response.output_text :
+        if  not response or not response.choices or len(response.choices)==0 or not response.choices[0] :
             self.logger.error("Error while genrating text with openAI")
             return None
-        return response.output_text
+        return response.choices[0].message.content
 
 
     def embed_text(self, text: str,  document_type: str =None):

@@ -20,6 +20,7 @@ class CohereProvider(LLMInterface):
         self.embedding_model_id = None 
         self.embedding_size =  None
 
+        self.enums = CohereEnums
         self.client =  cohere.ClientV2(api_key= self.api_key)
         self.logger = logging.getLogger(__name__)
 
@@ -53,14 +54,20 @@ class CohereProvider(LLMInterface):
         response = self.client.chat(
             model=self.generation_model_id,
             messages=chat_history,
-            max_output_tokens=max_output_tokens,
+            max_tokens=max_output_tokens,
             temperature=temperature
         )
-
-        if  not response or not response.message or len(response.content)==0 or not response.content[0] or not response.content[0].text:
-            self.logger.error("Error while genrating text with Cohere")
+    # check if message/content exists
+        if not response or not getattr(response, "message", None):
+            self.logger.error("No response from Cohere")
             return None
-        return response.output_text
+
+        if not response.message.content or len(response.message.content) == 0:
+            self.logger.error("Response content is empty")
+            return None
+
+        # return the first text content
+        return response.message.content[0].text
 
     def embed_text(self, text: str,  document_type: str =None):
         if not self.client: 
