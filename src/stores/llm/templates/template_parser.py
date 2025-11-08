@@ -24,10 +24,10 @@ class TemplateParser:
         if not group or not key: 
             return None
 
-        group_path = os.path.join(self.current_path, "locales", self.language, f"{group}".py)
+        group_path = os.path.join(self.current_path, "locales", self.language,  f"{group}.py")
         targeted_language= self.language
         if not os.path.exists(group_path):
-            group_path = os.path.join(self.current_path, "locales", self.default_language, f"{group}".py)
+            group_path = os.path.join(self.current_path, "locales", self.language, f"{group}.py")
             targeted_language= self.default_language
         
         if not os.path.exists(group_path):
