@@ -16,7 +16,7 @@ class Asset(SQLAlchamyBase):
     asset_config= Column(JSONB, nullable=True)
     asset_project_id= Column(Integer, ForeignKey("projects.project_id"), nullable=False)
     project = relationship("Project", back_populates="assets")
-    chunks = relationship("Chunk", back_populates="asset")
+    chunks = relationship("DataChunk", back_populates="asset")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable= False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable= True)
 

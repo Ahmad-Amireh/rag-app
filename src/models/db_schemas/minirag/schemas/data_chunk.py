@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from pydantic import BaseModel
 import uuid
 
-class Chunk(SQLAlchamyBase):
+class DataChunk(SQLAlchamyBase):
 
     __tablename__ = 'chunks'
 
